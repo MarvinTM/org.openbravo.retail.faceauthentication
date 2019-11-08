@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -15,6 +16,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.criterion.Restrictions;
@@ -30,17 +33,30 @@ import org.openbravo.model.ad.access.User;
 
 public class FaceAuthenticationManager extends DefaultAuthenticationManager {
 
+  private static final Logger log4j = LogManager.getLogger();
+
   @Override
   protected String doAuthenticate(HttpServletRequest request, HttpServletResponse response)
       throws AuthenticationException, ServletException, IOException {
 
     final VariablesSecureApp vars = new VariablesSecureApp(request, false);
 
-    String userName = vars.getStringParameter(LOGIN_PARAM);
-
-    if (true || userName != null) {
-      return super.doAuthenticate(request, response);
+    String password = vars.getStringParameter("password");
+    final Boolean resetPassword = Boolean.parseBoolean(vars.getStringParameter("resetPassword"));
+    final String sUserId;
+    if (resetPassword) {
+      sUserId = vars.getSessionValue("#AD_User_ID");
+    } else {
+      sUserId = (String) request.getSession().getAttribute("#Authenticated_user");
     }
+
+    final String strAjax = vars.getStringParameter("IsAjaxCall");
+    if (!StringUtils.isEmpty(sUserId) && !resetPassword) {
+      return sUserId;
+    }
+    // if (false && password != null) {
+    // return super.doAuthenticate(request, response);
+    // }
 
     // String image = "";
     // String imag8e =request.getHeader("image");
@@ -74,6 +90,7 @@ public class FaceAuthenticationManager extends DefaultAuthenticationManager {
     String user = null;
     try {
       responseObj = new JSONObject(content.toString());
+      log4j.info("response: " + responseObj.toString());
       success = responseObj.getBoolean("success");
       user = responseObj.getString("user");
     } catch (JSONException e) {
