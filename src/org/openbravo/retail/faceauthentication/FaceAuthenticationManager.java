@@ -45,7 +45,7 @@ public class FaceAuthenticationManager extends DefaultAuthenticationManager {
     // String image = "";
     // String image =request.getHeader("image");
 
-    String image = readImage();
+    String image = readImageFromRequest(vars);
 
     HttpClient httpClient = HttpClients.createDefault();
     HttpPost httpPost = new HttpPost("http://192.168.102.164:3000");
@@ -116,6 +116,17 @@ public class FaceAuthenticationManager extends DefaultAuthenticationManager {
       throw new AuthenticationException("IDENTIFICATION_FAILURE_TITLE", errorMsg, false);
     }
 
+  }
+
+  private String readImageFromRequest(VariablesSecureApp vars) {
+    try {
+      return vars.getInParameter("image");
+    } catch (ServletException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } finally {
+      return "";
+    }
   }
 
   private String readImage() throws ClientProtocolException, IOException {
