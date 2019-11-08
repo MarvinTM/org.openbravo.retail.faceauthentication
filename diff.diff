@@ -1,0 +1,14 @@
+diff --git a/web/org.openbravo.retail.faceauthentication/js/webcam-popup.js b/web/org.openbravo.retail.faceauthentication/js/webcam-popup.js
+index b8a2ebb..6390cdd 100644
+--- a/web/org.openbravo.retail.faceauthentication/js/webcam-popup.js
++++ b/web/org.openbravo.retail.faceauthentication/js/webcam-popup.js
+@@ -110,8 +110,7 @@
+                       OB.error('no se quien eres');
+                     } else {
+                       OB.info('bienvenido: ' + inResponse.userId);
+-
+-                      //                      window.location.reload();
++                      window.location.reload();
+                     }
+                   },
+                   fail: () => window.location.reload()

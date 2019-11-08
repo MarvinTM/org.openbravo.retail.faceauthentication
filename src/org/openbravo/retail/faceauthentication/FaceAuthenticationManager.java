@@ -54,9 +54,9 @@ public class FaceAuthenticationManager extends DefaultAuthenticationManager {
     if (!StringUtils.isEmpty(sUserId) && !resetPassword) {
       return sUserId;
     }
-    // if (false && password != null) {
-    // return super.doAuthenticate(request, response);
-    // }
+    if (password != null && !password.equals("")) {
+      return super.doAuthenticate(request, response);
+    }
 
     // String image = "";
     // String imag8e =request.getHeader("image");
