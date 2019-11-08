@@ -7,7 +7,7 @@
  ************************************************************************************
  */
 
-/*global OB, enyo*/
+/*global OB, enyo, faceapi*/
 
 enyo.kind({
   name: 'OB.OBPOSLogin.UI.Login.faceAuthenticationButton',
@@ -15,46 +15,21 @@ enyo.kind({
   i18nLabel: 'FA_FaceAuthenticationLbl',
   tap: function() {
     var me = this;
-    //FIXME-SKIN: Username element structure has changed since the new POS Skin
-    var loginuser = me.owner.$.formElementUsername
-        ? me.owner.$.formElementUsername.coreElement.getValue()
-        : me.owner.$.username.getValue(),
-      connectedCallback = function() {
-        OB.UTIL.showConfirmation.display(
-          '',
-          OB.I18N.getLabel('OBRETFP_PasswordRequestApproved')
-        );
-      },
-      notConnectedCallback = function() {
-        OB.UTIL.showError(
-          OB.I18N.getLabel('OBPOS_OfflineWindowRequiresOnline')
-        );
-        return;
-      };
-    if (loginuser === '') {
-      OB.UTIL.showError(OB.I18N.getLabel('OBRETFP_EmptyUser'));
-      return;
-    }
-    OB.UTIL.Approval.requestApproval(
-      me.model,
-      'OBRETFP_approval.forgotPassword',
-      function(approved, supervisor, approvalType) {
-        if (approved && supervisor) {
-          if (
-            OB.MobileApp.model.get('connectedToERP') ||
-            OB.UTIL.isNullOrUndefined(OB.MobileApp.model.get('connectedToERP'))
-          ) {
-            connectedCallback();
-          } else {
-            notConnectedCallback();
-          }
-        }
-      },
-      {
-        loginuser: loginuser,
-        terminal: OB.MobileApp.model.get('terminalName')
-      }
-    );
+    let models = '../org.openbravo.retail.faceauthentication/res/models';
+    let startPopup = () => {
+      this.dialog = OB.MobileApp.view.$.confirmationContainer.createComponent({
+        kind: 'OB.UI.FA.WebCam.Modal',
+        name: 'modalFaceAuthentication',
+        context: this
+      });
+      this.dialog.show();
+    };
+    Promise.all([
+      faceapi.loadTinyFaceDetectorModel(models),
+      faceapi.nets.ssdMobilenetv1.loadFromUri(models)
+    ])
+      .then(() => startPopup())
+      .catch(() => OB.error('Not able to load faceapi models'));
   },
   init: function(model) {
     this.model = model;

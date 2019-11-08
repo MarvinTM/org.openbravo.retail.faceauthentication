@@ -28,7 +28,7 @@ public class FaceAuthenticationComponentProvider extends BaseComponentProvider {
     final List<ComponentResource> globalResources = new ArrayList<>();
     final String prefix = "web/" + MODULE_JAVA_PACKAGE + "/js/";
 
-    final String[] resourceList = { "faceapi-utils", "webcam-button", "webcam-popup" };
+    final String[] resourceList = { "face-api", "faceapi-utils", "webcam-popup" ,"webcam-button"};
 
     for (String resource : resourceList) {
       globalResources.add(createComponentResource(ComponentResource.ComponentResourceType.Static,
