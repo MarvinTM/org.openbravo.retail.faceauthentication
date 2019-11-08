@@ -93,6 +93,7 @@
                   JSON.stringify(OB.MobileApp.model.get('loginUtilsParams'))
                 ) || {};
               params.image = value;
+              params.user = 'dummy';
               params.Command = 'DEFAULT';
               params.IsAjaxCall = 1;
               params.appName = OB.MobileApp.model.get('appName');
