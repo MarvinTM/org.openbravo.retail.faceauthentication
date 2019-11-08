@@ -28,6 +28,13 @@ public class FaceAuthenticationManager extends DefaultAuthenticationManager {
       throws AuthenticationException, ServletException, IOException {
 
     final VariablesSecureApp vars = new VariablesSecureApp(request, false);
+
+    String userName = vars.getStringParameter(LOGIN_PARAM);
+
+    if (userName != null) {
+      return super.doAuthenticate(request, response);
+    }
+
     String image = request.getHeader("image");
 
     HttpClient httpClient = HttpClients.createDefault();
