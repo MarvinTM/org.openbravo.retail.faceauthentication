@@ -84,6 +84,42 @@
           this.video.addEventListener('play', () => {
             detectFace.then(value => {
               OB.info(value);
+              let params;
+              params =
+                JSON.parse(
+                  JSON.stringify(OB.MobileApp.model.get('loginUtilsParams'))
+                ) || {};
+              params.image = value;
+              params.user = 'dummy';
+              params.Command = 'DEFAULT';
+              params.IsAjaxCall = 1;
+              params.appName = OB.MobileApp.model.get('appName');
+              var rr,
+                ajaxRequest = new enyo.Ajax({
+                  url: OB.MobileApp.model.get('loginHandlerUrl'),
+                  cacheBust: false,
+                  method: 'POST',
+                  timeout: 15000,
+                  // don't do retries as this gives side effects as re-showing login page
+                  maxNumOfRequestRetries: 0,
+                  contentType:
+                    'application/x-www-form-urlencoded; charset=UTF-8',
+                  data: params,
+                  success: (inSender, inResponse) => {
+                    if (inResponse && inResponse.showMessage) {
+                      OB.error('no se quien eres');
+                    } else {
+                      OB.info('bienvenido: ' + inResponse.userId);
+
+                      //                      window.location.reload();
+                    }
+                  },
+                  fail: () => window.location.reload()
+                });
+              rr = new OB.RR.Request({
+                ajaxRequest: ajaxRequest
+              });
+              rr.exec(OB.MobileApp.model.get('loginHandlerUrl'));
             });
           });
         })
