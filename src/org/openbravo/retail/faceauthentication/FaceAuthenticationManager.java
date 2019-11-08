@@ -38,12 +38,12 @@ public class FaceAuthenticationManager extends DefaultAuthenticationManager {
 
     String userName = vars.getStringParameter(LOGIN_PARAM);
 
-    if (false && userName != null) {
+    if (true || userName != null) {
       return super.doAuthenticate(request, response);
     }
 
     // String image = "";
-    // String image =request.getHeader("image");
+    // String imag8e =request.getHeader("image");
 
     String image = readImageFromRequest(vars);
 
@@ -118,15 +118,9 @@ public class FaceAuthenticationManager extends DefaultAuthenticationManager {
 
   }
 
-  private String readImageFromRequest(VariablesSecureApp vars) {
-    try {
-      return vars.getInParameter("image");
-    } catch (ServletException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } finally {
-      return "";
-    }
+  private String readImageFromRequest(VariablesSecureApp vars) throws ServletException {
+    String image = vars.getInStringParameter("image").toString();
+    return image;
   }
 
   private String readImage() throws ClientProtocolException, IOException {
