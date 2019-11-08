@@ -12,17 +12,11 @@
 (function() {
   enyo.kind({
     name: 'OB.UI.FA.Webcam',
-    classes: '',
+    style: 'width: 640px; height: 480px;',
     components: [
-      // {
-      //   tag: 'canvas',
-      //   name: 'overlay'
-      //   // style: ' zIndex: 2, position: "absolute", top: 0, left: 0 '
-      // },
       {
         tag: 'video',
         name: 'videoElement'
-        // style: ' zIndex: 1, position: "absolute", top: 0, left: 0 '
       }
     ]
   });
@@ -32,6 +26,7 @@
     kind: 'OB.UI.ModalAction',
     i18nHeader: 'FA_ScanFromWebcam',
     bodyContent: {
+      style: 'width: 640px; height: 480px;',
       components: [
         {
           kind: 'OB.UI.FA.Webcam'
@@ -45,30 +40,30 @@
           i18nContent: 'OBPOS_Cancel',
           tap: function() {
             this.doHideThisPopup();
-            // OB.OBCBS.BarcodeReader.shutdown();
           }
         }
       ]
     },
     executeOnHide: function() {
-      // OB.OBCBS.BarcodeReader.shutdown();
+      this.stream.getTracks()[0].stop();
+      this.destroyComponents();
     },
     executeOnShow: function() {
       this.inherited(arguments);
       this.video = null;
-      var me = this;
+      this.stream = null;
 
       const detectFace = new Promise((resolve, reject) => {
         let interval = setInterval(async () => {
-          if (me.video === null) {
+          if (this.video === null) {
             return;
           }
           const detection = await faceapi.detectSingleFace(
-            me.video,
+            this.video,
             new faceapi.TinyFaceDetectorOptions()
           );
           if (detection) {
-            var hiddenCanvas = faceapi.createCanvasFromMedia(me.video);
+            var hiddenCanvas = faceapi.createCanvasFromMedia(this.video);
             let finalImage = hiddenCanvas.toDataURL('image/jpeg');
             clearInterval(interval);
             resolve(finalImage);
@@ -77,21 +72,22 @@
       });
 
       navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then(function(stream) {
-          me.video = document.getElementById(
-            'terminal_confirmationContainer_modalFaceAuthentication_body_webcam_videoElement'
+        .getUserMedia({ video: { width: 640, height: 480 } })
+        .then(stream => {
+          this.stream = stream;
+          this.video = document.getElementById(
+            this.$.bodyContent.$.webcam.$.videoElement.id
           );
-          me.video.autoplay = true;
-          me.video.srcObject = stream;
-          me.video.addEventListener('play', () => {
+
+          this.video.autoplay = true;
+          this.video.srcObject = stream;
+          this.video.addEventListener('play', () => {
             detectFace.then(value => {
               OB.info(value);
             });
           });
         })
         .catch(error => OB.error('Error on start video ' + error));
-      // this._initializeReaderWhenDOMIsAvailable();
     }
   });
 })();

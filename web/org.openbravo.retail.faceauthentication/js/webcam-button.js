@@ -20,6 +20,7 @@ enyo.kind({
       this.dialog = OB.MobileApp.view.$.confirmationContainer.createComponent({
         kind: 'OB.UI.FA.WebCam.Modal',
         name: 'modalFaceAuthentication',
+        style: 'width: 670px',
         context: this
       });
       this.dialog.show();
