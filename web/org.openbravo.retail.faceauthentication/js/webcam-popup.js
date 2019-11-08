@@ -84,6 +84,11 @@
           this.video.addEventListener('play', () => {
             detectFace.then(value => {
               OB.info(value);
+              this.hide();
+              OB.UTIL.showLoadingTitleMessage(
+                true,
+                'FA_FaceRecognitionProcess'
+              );
               let params;
               params =
                 JSON.parse(
@@ -106,15 +111,31 @@
                     'application/x-www-form-urlencoded; charset=UTF-8',
                   data: params,
                   success: (inSender, inResponse) => {
+                    OB.UTIL.showLoading(false);
                     if (inResponse && inResponse.showMessage) {
-                      OB.error('no se quien eres');
+                      OB.UTIL.showConfirmation.display(
+                        'Face Recognition failed',
+                        'Face Recognition did not recognized you. Use regular login process'
+                      );
+                      return;
                     } else {
-                      OB.info('bienvenido: ' + inResponse.userId);
-
-                      //                      window.location.reload();
+                      window.location.reload();
                     }
                   },
-                  fail: () => window.location.reload()
+                  fail: (inSender, inResponse) => {
+                    OB.UTIL.showLoading(false);
+                    if (inResponse && inResponse === 'timeout') {
+                      OB.UTIL.showConfirmation.display(
+                        'Face Recognition failed',
+                        'Face Recognition has reached timeout. Please, try again or use regular login'
+                      );
+                      return;
+                    }
+                    OB.UTIL.showConfirmation.display(
+                      'Face Recognition failed',
+                      'Face Recognition has failed. Please, try again or use regular login'
+                    );
+                  }
                 });
               rr = new OB.RR.Request({
                 ajaxRequest: ajaxRequest
